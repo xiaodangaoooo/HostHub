@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Host Dashboard - HostHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Welcome, {{ current_user.first_name }}!</h1>
+        <a href="{{ url_for('host.create_listing_route') }}" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Create New Listing
+        </a>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+          <div class="card dashboard-stats">
+              <div class="card-body">
+                  <h3 class="card-title h5">Total Listings</h3>
+                  <p class="card-text display-6">{{ listings|length if listings else 0 }}</p>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="card dashboard-stats">
+              <div class="card-body">
+                  <h3 class="card-title h5">Active Listings</h3>
+                  <p class="card-text display-6">{{ active_listings }}</p>  <!-- Remove the |length -->
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="card dashboard-stats">
+              <div class="card-body">
+                  <h3 class="card-title h5">Applications</h3>
+                  <p class="card-text display-6">{{ applications_count }}</p>
+              </div>
+          </div>
+      </div>
+  </div>
+    <!-- Listings Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title h5 mb-0">Your Listings</h2>
+        </div>
+        <div class="card-body">
+            {% if listings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Work Hours</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Applications</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for listing in listings %}
+                        <tr>
+                            <td>
+                              <a href="{{ url_for('host.view_listing', listing_id=listing.listing_id) }}" 
+                                class="text-decoration-none">
+                                  {{ listing.title }}
+                              </a>
+                            </td>
+                            <td>{{ listing.city }}, {{ listing.country }}</td>
+                            <td>{{ listing.work_hour }}h/week</td>
+                            <td>{{ listing.duration_day }} days</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if listing.status == 'active' else 'secondary' }}">
+                                    {{ listing.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ listing.application_count }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('host.edit_listing', listing_id=listing.listing_id) }}" 
+                                       class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal{{ listing.listing_id }}">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Delete Modal for each listing -->
+                        <div class="modal fade" id="deleteModal{{ listing.listing_id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete "{{ listing.title }}"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('host.delete_listing_route', listing_id=listing.listing_id) }}" 
+                                              method="POST">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="mb-3">You haven't created any listings yet.</p>
+                <a href="{{ url_for('host.create_listing_route') }}" class="btn btn-primary">
+                    Create Your First Listing
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

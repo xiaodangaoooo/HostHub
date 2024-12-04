@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if listing %}Edit Listing{% else %}Create New Listing{% endif %} - HostHub
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h1 class="h3 mb-0">
+                        {% if listing %}Edit Listing{% else %}Create New Listing{% endif %}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Listing Details -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">Basic Information</h4>
+                            
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                       value="{{ listing.title if listing else '' }}" required>
+                                <div class="invalid-feedback">Please provide a title for your listing.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="5" required>{{ listing.description if listing else '' }}</textarea>
+                                <div class="invalid-feedback">Please provide a description.</div>
+                                <div class="form-text">Describe the work exchange opportunity in detail.</div>
+                            </div>
+                        </div>
+
+                        <!-- Work Details -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">Work Details</h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="work_hours" class="form-label">Work Hours per Week</label>
+                                    <input type="number" class="form-control" id="work_hours" name="work_hours" 
+                                           value="{{ listing.work_hour if listing else '' }}" min="1" max="40" required>
+                                    <div class="invalid-feedback">Please specify weekly work hours (1-40).</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="duration" class="form-label">Duration (Days)</label>
+                                    <input type="number" class="form-control" id="duration" name="duration" 
+                                           value="{{ listing.duration_day if listing else '' }}" min="1" max="180" required>
+                                    <div class="invalid-feedback">Please specify duration (1-180 days).</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="work_type" class="form-label">Type of Work</label>
+                                <input type="text" class="form-control" id="work_type" name="work_type" 
+                                       value="{{ listing.work_type if listing else '' }}" 
+                                       placeholder="e.g., Farming, Teaching, Gardening" required>
+                                <div class="invalid-feedback">Please specify the type of work.</div>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">Location</h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="country" class="form-label">Country</label>
+                                    <input type="text" class="form-control" id="country" name="country" 
+                                           value="{{ listing.country if listing else '' }}" required>
+                                    <div class="invalid-feedback">Please provide a country.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="state" class="form-label">State/Province</label>
+                                    <input type="text" class="form-control" id="state" name="state" 
+                                           value="{{ listing.state if listing else '' }}">
+                                    <div class="form-text">Optional for some countries.</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" 
+                                           value="{{ listing.city if listing else '' }}" required>
+                                    <div class="invalid-feedback">Please provide a city.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="zip_code" class="form-label">ZIP/Postal Code</label>
+                                    <input type="text" class="form-control" id="zip_code" name="zip_code" 
+                                           value="{{ listing.zip_code if listing else '' }}">
+                                    <div class="form-text">Optional for some countries.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if listing %}Save Changes{% else %}Create Listing{% endif %}
+                            </button>
+                            <a href="{{ url_for('host.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %}

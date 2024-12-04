@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}{{ listing.title }} - HostHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mt-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('host.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">{{ listing.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Listing Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="mb-2">{{ listing.title }}</h1>
+            <p class="text-muted mb-0">
+                <i class="bi bi-geo-alt"></i> 
+                {{ listing.city }}, {{ listing.state if listing.state else listing.country }}
+            </p>
+        </div>
+        <div class="btn-group">
+            <a href="{{ url_for('host.edit_listing', listing_id=listing.listing_id) }}" 
+               class="btn btn-outline-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <button type="button" class="btn btn-outline-danger" 
+                    data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Left Column: Listing Details -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">Description</h4>
+                    <p class="card-text">{{ listing.description }}</p>
+                    
+                    <h4 class="mt-4">Work Details</h4>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="border rounded p-3">
+                                <h6 class="text-muted mb-1">Work Hours</h6>
+                                <p class="mb-0 h5">{{ listing.work_hour }} hours/week</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="border rounded p-3">
+                                <h6 class="text-muted mb-1">Duration</h6>
+                                <p class="mb-0 h5">{{ listing.duration_day }} days</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="border rounded p-3">
+                                <h6 class="text-muted mb-1">Type of Work</h6>
+                                <p class="mb-0 h5">{{ listing.work_type }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="mt-4">Location</h4>
+                    <address class="mb-0">
+                        {% if listing.state %}{{ listing.state }}<br>{% endif %}
+                        {{ listing.city }}<br>
+                        {{ listing.country }}
+                        {% if listing.zip_code %}<br>{{ listing.zip_code }}{% endif %}
+                    </address>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Stats and Applications -->
+        <div class="col-md-4">
+            <!-- Stats Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">Overview</h4>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <h6 class="text-muted mb-1">Status</h6>
+                            <span class="badge bg-{{ 'success' if listing.status == 'active' else 'secondary' }}">
+                                {{ listing.status }}
+                            </span>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="text-muted mb-1">Total Applications</h6>
+                            <span class="h5">{{ listing.total_applications }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted mb-1">Pending</h6>
+                            <span class="h5">{{ listing.pending_applications }}</span>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="text-muted mb-1">Accepted</h6>
+                            <span class="h5">{{ listing.accepted_applications }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Applications List -->
+            {% if applications %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Applications</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for application in applications %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-1">{{ application.first_name }} {{ application.last_name }}</h6>
+                            <small class="text-muted">{{ application.date_applied.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        <p class="mb-1 small text-muted">
+                            Skills: {{ application.skills }}
+                        </p>
+                        <div class="mt-2">
+                            <span class="badge bg-{{ 'warning' if application.status == 'pending' 
+                                else 'success' if application.status == 'accepted'
+                                else 'danger' }}">
+                                {{ application.status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete "{{ listing.title }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('host.delete_listing_route', listing_id=listing.listing_id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

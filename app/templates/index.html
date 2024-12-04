@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to HostHub{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to HostHub</h1>
+    <p class="lead">Connect with hosts worldwide and experience authentic cultural exchange</p>
+    <hr class="my-4">
+    {% if not current_user.is_authenticated %}
+        <p>Join our community today!</p>
+        <!-- Changed from 'register' to 'auth.register' -->
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Get Started</a>
+        <!-- Changed from 'login' to 'auth.login' -->
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">For Travelers</h5>
+                <p class="card-text">Find unique opportunities to stay with local hosts while contributing your skills.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">For Hosts</h5>
+                <p class="card-text">Connect with travelers who can help with your projects while experiencing local culture.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Cultural Exchange</h5>
+                <p class="card-text">Create meaningful connections and share experiences across cultures.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
