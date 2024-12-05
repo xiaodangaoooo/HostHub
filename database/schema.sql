@@ -143,6 +143,8 @@ CREATE TABLE Notification (
 -- --------------------------------------------------------
 
 -- Function to get total number of active listings for a host
+DELIMITER //
+
 CREATE FUNCTION GetHostActiveListingsCount(p_host_id INT) 
 RETURNS INT
 DETERMINISTIC
@@ -176,13 +178,13 @@ END //
 
 DELIMITER ;
 
-DELIMITER //
-
 -- --------------------------------------------------------
 -- Stored Procedures
 -- --------------------------------------------------------
 
 -- Procedure to handle listing application process
+DELIMITER //
+
 CREATE PROCEDURE ApplyToListing(
     IN p_traveler_id INT,
     IN p_listing_id INT,

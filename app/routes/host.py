@@ -9,6 +9,7 @@ from app.utils.db_utils import (
     update_location,
     delete_listing
 )
+from app.utils.db import get_db
 
 host_bp = Blueprint('host', __name__)
 
@@ -32,44 +33,61 @@ def create_listing_route():
         flash('Access denied. Host privileges required.')
         return redirect(url_for('main.index'))
     
-    if request.method == 'POST':
-        title = request.form.get('title')
-        description = request.form.get('description')
-        work_hours = request.form.get('work_hours')
-        duration = request.form.get('duration')
-        work_type = request.form.get('work_type')
-        country = request.form.get('country')
-        state = request.form.get('state')
-        city = request.form.get('city')
-        zip_code = request.form.get('zip_code')
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    try:
+        # Check and create host record if needed
+        cursor.execute('SELECT * FROM Host WHERE user_id = %s', (current_user.id,))
+        host = cursor.fetchone()
         
-        if not all([title, description, work_hours, duration, work_type, country, city]):
-            flash('Please fill in all required fields.')
-            return render_template('host/listing_form.html')
-        
-        # Create location
-        location_id = create_location(country, state, city, zip_code)
-        if not location_id:
-            flash('Error creating location.')
-            return render_template('host/listing_form.html')
-        
-        # Create listing
-        listing_id = create_listing(
-            current_user.id,
-            location_id,
-            title,
-            description,
-            work_hours,
-            duration,
-            work_type
-        )
-        
-        if listing_id:
-            flash('Listing created successfully!')
-            return redirect(url_for('host.dashboard'))
-        else:
-            flash('Error creating listing.')
-            return render_template('host/listing_form.html')
+        if not host:
+            cursor.execute('''
+                INSERT INTO Host (user_id, rating)
+                VALUES (%s, 0.0)
+            ''', (current_user.id,))
+            db.commit()
+            
+        if request.method == 'POST':
+            title = request.form.get('title')
+            description = request.form.get('description')
+            work_hours = request.form.get('work_hours')
+            duration = request.form.get('duration')
+            work_type = request.form.get('work_type')
+            country = request.form.get('country')
+            state = request.form.get('state')
+            city = request.form.get('city')
+            zip_code = request.form.get('zip_code')
+            
+            if not all([title, description, work_hours, duration, work_type, country, city]):
+                flash('Please fill in all required fields.')
+                return render_template('host/listing_form.html')
+            
+            # Create location
+            location_id = create_location(country, state, city, zip_code)
+            if not location_id:
+                flash('Error creating location.')
+                return render_template('host/listing_form.html')
+            
+            # Create listing
+            listing_id = create_listing(
+                current_user.id,
+                location_id,
+                title,
+                description,
+                work_hours,
+                duration,
+                work_type
+            )
+            
+            if listing_id:
+                flash('Listing created successfully!')
+                return redirect(url_for('host.dashboard'))
+            else:
+                flash('Error creating listing.')
+                return render_template('host/listing_form.html')
+    finally:
+        cursor.close()
     
     return render_template('host/listing_form.html')
 
