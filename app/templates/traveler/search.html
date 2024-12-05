@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Search Listings - HostHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('traveler.search_listings') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" 
+                           placeholder="Enter city or country" value="{{ request.args.get('location', '') }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="work_type" class="form-label">Work Type</label>
+                    <input type="text" class="form-control" id="work_type" name="work_type" 
+                           placeholder="e.g., Farming, Teaching" value="{{ request.args.get('work_type', '') }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="duration" class="form-label">Max Duration (Days)</label>
+                    <select class="form-select" id="duration" name="duration">
+                        <option value="">Any duration</option>
+                        <option value="7" {% if request.args.get('duration') == '7' %}selected{% endif %}>1 week</option>
+                        <option value="14" {% if request.args.get('duration') == '14' %}selected{% endif %}>2 weeks</option>
+                        <option value="30" {% if request.args.get('duration') == '30' %}selected{% endif %}>1 month</option>
+                        <option value="90" {% if request.args.get('duration') == '90' %}selected{% endif %}>3 months</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="row">
+        {% if listings %}
+            {% for listing in listings %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ listing.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="bi bi-geo-alt"></i> {{ listing.city }}, {{ listing.country }}
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-2">{{ listing.work_hour }}h/week</span>
+                                <span class="badge bg-info">{{ listing.duration_day }} days</span>
+                                <span class="badge bg-secondary">{{ listing.work_type }}</span>
+                            </div>
+                            
+                            <p class="card-text">{{ listing.description[:150] }}...</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Host: {{ listing.first_name }} {{ listing.last_name }}
+                                    {% if listing.host_rating %}
+                                        <br>Rating: {{ "%.1f"|format(listing.host_rating) }}/5.0
+                                    {% endif %}
+                                </small>
+                                <a href="{{ url_for('traveler.view_listing', listing_id=listing.listing_id) }}" 
+                                   class="btn btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if pagination and pagination.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('traveler.search_listings', page=pagination.prev_num, **request.args) }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page in pagination.iter_pages() %}
+                            {% if page %}
+                                <li class="page-item {{ 'active' if page == pagination.page else '' }}">
+                                    <a class="page-link" href="{{ url_for('traveler.search_listings', page=page, **request.args) }}">{{ page }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('traveler.search_listings', page=pagination.next_num, **request.args) }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No listings found matching your criteria. Try adjusting your search filters.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
