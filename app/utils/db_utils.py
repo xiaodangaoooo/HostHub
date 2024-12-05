@@ -1,7 +1,4 @@
-# app/utils/db_utils.py
-
 from app.utils.db import get_db
-from datetime import datetime
 
 # Host-related functions
 def get_host_listings(host_id):

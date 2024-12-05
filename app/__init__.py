@@ -4,7 +4,6 @@ from config import Config
 from app.utils.db import close_db
 from app.models.user import User
 
-# Initialize extensions
 login_manager = LoginManager()
 
 @login_manager.user_loader

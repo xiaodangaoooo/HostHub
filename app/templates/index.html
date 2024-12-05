@@ -9,9 +9,7 @@
     <hr class="my-4">
     {% if not current_user.is_authenticated %}
         <p>Join our community today!</p>
-        <!-- Changed from 'register' to 'auth.register' -->
         <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Get Started</a>
-        <!-- Changed from 'login' to 'auth.login' -->
         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">Login</a>
     {% endif %}
 </div>

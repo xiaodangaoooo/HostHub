@@ -81,17 +81,3 @@ def view_listing(listing_id):
         return render_template('traveler/listing_detail.html', listing=listing)
     finally:
         cursor.close()
-
-@traveler_bp.route('/listing/<int:listing_id>/apply', methods=['GET', 'POST'])
-@login_required
-def apply_listing(listing_id):
-    if current_user.role_type != 'traveler':
-        flash('Access denied. Traveler privileges required.')
-        return redirect(url_for('main.index'))
-        
-    if request.method == 'POST':
-        # Handle application submission
-        introduction = request.form.get('introduction')
-        # Add application creation logic here
-        
-    return render_template('traveler/apply.html', listing_id=listing_id)
