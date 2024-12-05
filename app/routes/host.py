@@ -7,7 +7,8 @@ from app.utils.db_utils import (
     get_listing_details,
     update_listing,
     update_location,
-    delete_listing
+    delete_listing,
+    get_other_host_listings
 )
 from app.utils.db import get_db
 
@@ -21,10 +22,13 @@ def dashboard():
         return redirect(url_for('main.index'))
     
     listings, active_count, applications_count = get_host_listings(current_user.id)
+    other_listings = get_other_host_listings(current_user.id)
+    
     return render_template('host/dashboard.html',
                          listings=listings,
                          active_listings=active_count,
-                         applications_count=applications_count)
+                         applications_count=applications_count,
+                         other_listings=other_listings)
 
 @host_bp.route('/listings/create', methods=['GET', 'POST'])
 @login_required

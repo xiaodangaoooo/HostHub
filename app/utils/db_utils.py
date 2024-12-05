@@ -429,3 +429,27 @@ def get_recent_listings(limit=5):
         return cursor.fetchall()
     finally:
         cursor.close()
+
+def get_other_host_listings(current_host_id, limit=5):
+    """Get recent listings from other hosts"""
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT 
+                l.listing_id, l.title, l.work_hour, l.duration_day, l.work_type,
+                loc.city, loc.country,
+                CONCAT(u.first_name, ' ', u.last_name) as host_name,
+                h.rating as host_rating,
+                l.created_at
+            FROM Listing l
+            JOIN Location loc ON l.location_id = loc.location_id
+            JOIN Host h ON l.host_id = h.user_id
+            JOIN User u ON h.user_id = u.user_id
+            WHERE l.host_id != %s AND l.status = 'active'
+            ORDER BY l.created_at DESC
+            LIMIT %s
+        ''', (current_host_id, limit))
+        return cursor.fetchall()
+    finally:
+        cursor.close()

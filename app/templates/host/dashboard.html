@@ -126,6 +126,53 @@
                 </a>
             </div>
             {% endif %}
+            <!-- Other Hosts' Recent Listings -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="card-title h5 mb-0">Recent Listings from Other Hosts</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if other_listings %}
+                            {% for listing in other_listings %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ listing.title }}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ listing.city }}, {{ listing.country }}
+                                        </h6>
+                                        
+                                        <div class="mb-2">
+                                            <span class="badge bg-primary me-1">{{ listing.work_hour }}h/week</span>
+                                            <span class="badge bg-info me-1">{{ listing.duration_day }} days</span>
+                                            <span class="badge bg-secondary">{{ listing.work_type }}</span>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <small class="text-muted d-block">Host: {{ listing.host_name }}</small>
+                                            {% if listing.host_rating %}
+                                                <small class="text-muted">Rating: {{ "%.1f"|format(listing.host_rating) }}/5.0</small>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="mt-2 text-end">
+                                            <small class="text-muted">
+                                                Posted {{ listing.created_at.strftime('%Y-%m-%d') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12">
+                                <p class="text-center mb-0">No recent listings from other hosts available.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
