@@ -33,10 +33,13 @@ HostHub is a web platform designed to facilitate cultural exchange by connecting
   - Bootstrap for responsive design
   - JavaScript for interactive features
 
-## Installation
+## Database Setup
+1. Open MySQL Workbench
+2. Connect to your local MySQL server
+3. Open and execute `database/schema.sql`
+5. Verify tables are created in the 'hosthub' database
 
-1. Clone the repository:
-git clone https://github.com/xiaodangaoooo/HostHub.git
+## Installation
 cd HostHub
 
 Create and activate a virtual environment:
@@ -49,17 +52,12 @@ Install required packages:
 pip install -r requirements.txt
 
 Create a .env file in the project root with the following content:
-
 SECRET_KEY=your_secret_key
 MYSQL_HOST=localhost
 MYSQL_USER=your_username
 MYSQL_PASSWORD=your_password
 MYSQL_DB=hosthub
 
-Initialize the database:
-
-flask init-db
-Running the Application
 
 Make sure your virtual environment is activated
 Run the development server:
