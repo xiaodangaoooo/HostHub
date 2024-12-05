@@ -405,3 +405,27 @@ def update_application_status(application_id, new_status, host_id):
         return False
     finally:
         cursor.close()
+
+def get_recent_listings(limit=5):
+    """Get the most recent active listings with host and location info"""
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute('''
+            SELECT 
+                l.*, 
+                loc.city, 
+                loc.country,
+                CONCAT(u.first_name, ' ', u.last_name) as host_name,
+                h.rating as host_rating
+            FROM Listing l
+            JOIN Location loc ON l.location_id = loc.location_id
+            JOIN Host h ON l.host_id = h.user_id
+            JOIN User u ON h.user_id = u.user_id
+            WHERE l.status = 'active'
+            ORDER BY l.created_at DESC
+            LIMIT %s
+        ''', (limit,))
+        return cursor.fetchall()
+    finally:
+        cursor.close()

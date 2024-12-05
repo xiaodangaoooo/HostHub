@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.utils.db import get_db
+from app.utils.db_utils import get_recent_listings
 
 traveler_bp = Blueprint('traveler', __name__)
 
@@ -11,7 +12,15 @@ def dashboard():
         flash('Access denied. Traveler privileges required.')
         return redirect(url_for('main.index'))
     
-    return render_template('traveler/dashboard.html')
+    # Get recent listings
+    recent_listings = get_recent_listings(5)
+    
+    # Get user's applications if you have that functionality
+    applications = []  # Replace with actual application data
+    
+    return render_template('traveler/dashboard.html',
+                         recent_listings=recent_listings,
+                         applications=applications)
 
 @traveler_bp.route('/search')
 def search_listings():
