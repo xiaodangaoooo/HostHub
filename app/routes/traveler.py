@@ -68,25 +68,41 @@ def search_listings():
 
 @traveler_bp.route('/listing/<int:listing_id>')
 def view_listing(listing_id):
+    if not listing_id:
+        flash('Invalid listing ID.')
+        return redirect(url_for('traveler.search_listings'))
+        
     db = get_db()
     cursor = db.cursor(dictionary=True)
     
     try:
-        # Get listing details
+        # Get listing details with host information
         cursor.execute('''
-            SELECT l.*, loc.*, u.first_name, u.last_name, h.rating
+            SELECT 
+                l.*,
+                loc.city, loc.country, loc.state, loc.zip_code,
+                CONCAT(u.first_name, ' ', u.last_name) as host_name,
+                h.rating as host_rating,
+                h.preferred_language,
+                u.created_at as host_created_at,
+                COUNT(DISTINCT r.review_id) as total_reviews
             FROM Listing l
             JOIN Location loc ON l.location_id = loc.location_id
             JOIN Host h ON l.host_id = h.user_id
             JOIN User u ON h.user_id = u.user_id
+            LEFT JOIN Review r ON h.user_id = r.host_id AND r.status = 'active'
             WHERE l.listing_id = %s
+            GROUP BY l.listing_id
         ''', (listing_id,))
+        
         listing = cursor.fetchone()
         
         if not listing:
             flash('Listing not found.')
             return redirect(url_for('traveler.search_listings'))
-            
-        return render_template('traveler/listing_detail.html', listing=listing)
+        
+        return render_template('traveler/listing_detail.html',
+                             listing=listing)
+                             
     finally:
         cursor.close()
